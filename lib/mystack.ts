@@ -18,7 +18,9 @@ export class MyStack extends cdk.Stack {
       cpu: 256
     });
     const container = taskDefinition.addContainer("MyContainer", {
-      image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_2")
+      image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_2"),
+      command: ["/bin/bash", "-c", "./duckling & ./bp"],
+      logging: ecs.LogDrivers.awsLogs({streamPrefix: 'spgtest'})
     });
     container.addPortMappings({
       containerPort: 3000
