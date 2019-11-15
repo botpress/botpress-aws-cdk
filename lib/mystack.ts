@@ -2,7 +2,6 @@ import cdk = require("@aws-cdk/core");
 import ec2 = require("@aws-cdk/aws-ec2");
 import ecs = require("@aws-cdk/aws-ecs");
 import ecsPatterns = require("@aws-cdk/aws-ecs-patterns");
-import { ContainerDefinition } from "@aws-cdk/aws-ecs";
 
 export class MyStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -30,8 +29,6 @@ export class MyStack extends cdk.Stack {
       "Service",
       {
         cluster,
-        // memoryLimitMiB: 1024,
-        // cpu: 512,
         taskDefinition
       }
     );
