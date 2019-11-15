@@ -21,7 +21,8 @@ export class MyStack extends cdk.Stack {
         memoryLimitMiB: 1024,
         cpu: 512,
         taskImageOptions: {
-          image: ecs.ContainerImage.fromRegistry("amazon/amazon-ecs-sample")
+          image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_2"),
+          containerPort: 3000
         }
       }
     );
