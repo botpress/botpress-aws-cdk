@@ -1,6 +1,6 @@
 import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
 import cdk = require('@aws-cdk/core');
-import Tempdir = require('../lib/tempdir-stack');
+import Tempdir = require('../lib/mystack');
 
 test('Empty Stack', () => {
     const app = new cdk.App();

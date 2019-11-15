@@ -1,6 +1,6 @@
 import cdk = require('@aws-cdk/core');
 
-export class TempdirStack extends cdk.Stack {
+export class MyStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 

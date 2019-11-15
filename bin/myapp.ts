@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import cdk = require('@aws-cdk/core');
-import { TempdirStack } from '../lib/tempdir-stack';
+import { MyStack } from '../lib/mystack';
 
 const app = new cdk.App();
-new TempdirStack(app, 'TempdirStack');
+new MyStack(app, 'MyStack');
