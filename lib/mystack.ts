@@ -26,5 +26,9 @@ export class MyStack extends cdk.Stack {
         }
       }
     );
+
+    loadBalancedFargateService.targetGroup.configureHealthCheck({
+      path: "/admin/"
+    });
   }
 }
