@@ -14,13 +14,17 @@ export class MyStack extends cdk.Stack {
     });
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, "TaskDef", {
-      memoryLimitMiB: 512,
-      cpu: 256
+      memoryLimitMiB: 3072,
+      cpu: 512
     });
     const container = taskDefinition.addContainer("MyContainer", {
       image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_2"),
-      command: ["/bin/bash", "-c", "./duckling & ./bp"],
-      logging: ecs.LogDrivers.awsLogs({streamPrefix: 'spgtest'})
+      command: [
+        "/bin/bash",
+        "-c",
+        "mkdir -p /botpress/embeddings && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.100.bin && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.bpe.model ; ./duckling & ./bp lang --langDir /botpress/embeddings & ./bp"
+      ],
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: "spgtest" })
     });
     container.addPortMappings({
       containerPort: 3000
@@ -31,7 +35,8 @@ export class MyStack extends cdk.Stack {
       "Service",
       {
         cluster,
-        taskDefinition
+        taskDefinition,
+        healthCheckGracePeriod: cdk.Duration.seconds(600)
       }
     );
 
