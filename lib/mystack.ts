@@ -96,7 +96,8 @@ export class MyStack extends cdk.Stack {
         REDIS_URL: `redis://${cacheCluster.attrRedisEndpointAddress}:${cacheCluster.attrRedisEndpointPort}`,
         PRO_ENABLED: "true",
         CLUSTER_ENABLED: "true",
-        AUTO_MIGRATE: "true"
+        AUTO_MIGRATE: "true",
+        BP_MODULE_NLU_LANGUAGESOURCES: '[{"endpoint":"http://localhost:3100"}]'
       },
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: "spgtest",
