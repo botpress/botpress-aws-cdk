@@ -114,8 +114,8 @@ export class MyStack extends cdk.Stack {
       {
         cluster,
         taskDefinition,
-        healthCheckGracePeriod: cdk.Duration.minutes(7)
-        // desiredCount:2
+        healthCheckGracePeriod: cdk.Duration.minutes(7),
+        desiredCount: 2
       }
     );
 
