@@ -5,6 +5,7 @@ import ecsPatterns = require("@aws-cdk/aws-ecs-patterns");
 import rds = require("@aws-cdk/aws-rds");
 import secretsmanager = require("@aws-cdk/aws-secretsmanager");
 import logs = require("@aws-cdk/aws-logs");
+import elasticache = require("@aws-cdk/aws-elasticache");
 
 export class MyStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -49,6 +50,29 @@ export class MyStack extends cdk.Stack {
       } as any
     });
 
+    const redisSecurityGroup = new ec2.SecurityGroup(
+      this,
+      "RedisSecurityGroup",
+      {
+        vpc
+      }
+    );
+    const cacheSubnetGroup = new elasticache.CfnSubnetGroup(
+      this,
+      "CacheSubnetGroup",
+      {
+        description: "",
+        subnetIds: vpc.privateSubnets.map(subnet => subnet.subnetId)
+      }
+    );
+    const cacheCluster = new elasticache.CfnCacheCluster(this, "RedisCluster", {
+      cacheNodeType: "cache.m5.large",
+      engine: "redis",
+      numCacheNodes: 1,
+      vpcSecurityGroupIds: [redisSecurityGroup.securityGroupId],
+      cacheSubnetGroupName: cacheSubnetGroup.ref
+    });
+
     const cluster = new ecs.Cluster(this, "Cluster", {
       vpc
     });
@@ -58,7 +82,7 @@ export class MyStack extends cdk.Stack {
       cpu: 512
     });
     const container = taskDefinition.addContainer("MyContainer", {
-      image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_2"),
+      image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_3"),
       command: [
         "/bin/bash",
         "-c",
@@ -68,7 +92,11 @@ export class MyStack extends cdk.Stack {
         DATABASE_URL: `postgres://${dbUsername}:${dbSecret
           .secretValueFromJson("password")
           .toString()}@${dbCluster.clusterEndpoint.socketAddress}/${dbName}`,
-        BPFS_STORAGE: "database"
+        BPFS_STORAGE: "database",
+        REDIS_URL: `redis://${cacheCluster.attrRedisEndpointAddress}:${cacheCluster.attrRedisEndpointPort}`,
+        PRO_ENABLED: "true",
+        CLUSTER_ENABLED: "true",
+        AUTO_MIGRATE: "true"
       },
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: "spgtest",
@@ -86,10 +114,16 @@ export class MyStack extends cdk.Stack {
         cluster,
         taskDefinition,
         healthCheckGracePeriod: cdk.Duration.minutes(7)
+        // desiredCount:2
       }
     );
 
     dbCluster.connections.allowFrom(
+      loadBalancedFargateService.service,
+      ec2.Port.allTraffic()
+    );
+
+    redisSecurityGroup.connections.allowFrom(
       loadBalancedFargateService.service,
       ec2.Port.allTraffic()
     );
