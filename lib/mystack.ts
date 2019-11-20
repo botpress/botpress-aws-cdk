@@ -11,6 +11,11 @@ export class MyStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const domainName = process.env.DOMAIN_NAME;
+    if (!domainName) {
+      throw "DOMAIN_NAME must be defined";
+    }
+
     const vpc = new ec2.Vpc(this, "VPC");
 
     const dbSecret = new secretsmanager.Secret(this, "DbSecret", {
@@ -86,7 +91,7 @@ export class MyStack extends cdk.Stack {
       command: [
         "/bin/bash",
         "-c",
-        'echo "starting container" && mkdir -p /botpress/embeddings && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.100.bin && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.bpe.model ; ./duckling & ./bp lang --langDir /botpress/embeddings & ./bp'
+        'echo "starting container" && mkdir -p /botpress/embeddings && wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.100.bin && wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.bpe.model ; ./duckling & ./bp lang --langDir /botpress/embeddings & ./bp'
       ],
       environment: {
         DATABASE_URL: `postgres://${dbUsername}:${dbSecret
@@ -97,7 +102,10 @@ export class MyStack extends cdk.Stack {
         PRO_ENABLED: "true",
         CLUSTER_ENABLED: "true",
         AUTO_MIGRATE: "true",
-        BP_MODULE_NLU_LANGUAGESOURCES: '[{"endpoint":"http://localhost:3100"}]'
+        BP_MODULE_NLU_LANGUAGESOURCES: '[{"endpoint":"http://localhost:3100"}]',
+        BP_MODULE_NLU_DUCKLINGURL: '[{"endpoint":"http://localhost:8000"}]',
+        EXTERNAL_URL: `https://${domainName}`,
+        BP_PRODUCTION: "true"
       },
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: "spgtest",
