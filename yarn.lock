@@ -342,6 +342,22 @@
     "@aws-cdk/aws-iam" "1.16.3"
     "@aws-cdk/core" "1.16.3"
 
+"@aws-cdk/aws-rds@^1.16.3":
+  version "1.16.3"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-rds/-/aws-rds-1.16.3.tgz#bbf53cb33d607ed13c605a61023dff973ed5b7f4"
+  integrity sha512-S5ewCYk2MCRJ3oj+/bc4AjMKQoi3j+LakYUx5471tAlK4b58bnSGFjl3fZ++hShu71HV6lvOFeVmfrhCs/ZbSA==
+  dependencies:
+    "@aws-cdk/aws-cloudwatch" "1.16.3"
+    "@aws-cdk/aws-ec2" "1.16.3"
+    "@aws-cdk/aws-events" "1.16.3"
+    "@aws-cdk/aws-iam" "1.16.3"
+    "@aws-cdk/aws-kms" "1.16.3"
+    "@aws-cdk/aws-lambda" "1.16.3"
+    "@aws-cdk/aws-logs" "1.16.3"
+    "@aws-cdk/aws-sam" "1.16.3"
+    "@aws-cdk/aws-secretsmanager" "1.16.3"
+    "@aws-cdk/core" "1.16.3"
+
 "@aws-cdk/aws-route53-targets@1.16.3":
   version "1.16.3"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-route53-targets/-/aws-route53-targets-1.16.3.tgz#b1e538916225e0cec9dda97a572580e707d85ea9"
@@ -386,6 +402,13 @@
     "@aws-cdk/aws-events" "1.16.3"
     "@aws-cdk/aws-iam" "1.16.3"
     "@aws-cdk/aws-kms" "1.16.3"
+    "@aws-cdk/core" "1.16.3"
+
+"@aws-cdk/aws-sam@1.16.3":
+  version "1.16.3"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-sam/-/aws-sam-1.16.3.tgz#bcb111ba8e2796a0d7da6beb1568444a99d27654"
+  integrity sha512-5nMEy6jz5EjP/p7z3yxUJiLuxffu1yE+PO8p21YXQLoliq6D3JZdO+T7xaGiAUeoptoCBrCv4Fa7oichiDdLaQ==
+  dependencies:
     "@aws-cdk/core" "1.16.3"
 
 "@aws-cdk/aws-secretsmanager@1.16.3":

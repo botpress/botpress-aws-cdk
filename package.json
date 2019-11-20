@@ -26,6 +26,7 @@
     "@aws-cdk/aws-ecs-patterns": "^1.16.3",
     "@aws-cdk/aws-elasticloadbalancingv2": "^1.16.3",
     "@aws-cdk/aws-elasticloadbalancingv2-targets": "^1.16.3",
+    "@aws-cdk/aws-rds": "^1.16.3",
     "@aws-cdk/core": "^1.16.3",
     "source-map-support": "^0.5.16"
   }

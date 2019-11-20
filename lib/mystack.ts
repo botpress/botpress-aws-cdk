@@ -3,6 +3,8 @@ import ec2 = require("@aws-cdk/aws-ec2");
 import ecs = require("@aws-cdk/aws-ecs");
 import ecsPatterns = require("@aws-cdk/aws-ecs-patterns");
 import rds = require("@aws-cdk/aws-rds");
+import secretsmanager = require("@aws-cdk/aws-secretsmanager");
+import logs = require("@aws-cdk/aws-logs");
 
 export class MyStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -10,14 +12,27 @@ export class MyStack extends cdk.Stack {
 
     const vpc = new ec2.Vpc(this, "VPC");
 
+    const dbSecret = new secretsmanager.Secret(this, "DbSecret", {
+      generateSecretString: {
+        passwordLength: 30,
+        secretStringTemplate: JSON.stringify({}),
+        generateStringKey: "password",
+        excludeCharacters: '"@/\\',
+        excludePunctuation: true
+      }
+    });
+
     const dbName = "botpressdb";
+    const dbUsername = "clusteradmin";
+
     const dbCluster = new rds.DatabaseCluster(this, "Database", {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
       defaultDatabaseName: dbName,
       instances: 1,
       masterUser: {
-        username: "clusteradmin"
+        username: dbUsername,
+        password: dbSecret.secretValueFromJson("password")
       },
       instanceProps: {
         instanceType: ec2.InstanceType.of(
@@ -47,9 +62,18 @@ export class MyStack extends cdk.Stack {
       command: [
         "/bin/bash",
         "-c",
-        "mkdir -p /botpress/embeddings && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.100.bin && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.bpe.model ; ./duckling & ./bp lang --langDir /botpress/embeddings & ./bp"
+        'echo "starting container" && mkdir -p /botpress/embeddings && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.100.bin && time wget -P /botpress/embeddings -q -nc https://nyc3.digitaloceanspaces.com/botpress-public/embeddings/bp.en.bpe.model ; ./duckling & ./bp lang --langDir /botpress/embeddings & ./bp'
       ],
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: "spgtest" })
+      environment: {
+        DATABASE_URL: `postgres://${dbUsername}:${dbSecret
+          .secretValueFromJson("password")
+          .toString()}@${dbCluster.clusterEndpoint.socketAddress}/${dbName}`,
+        BPFS_STORAGE: "database"
+      },
+      logging: ecs.LogDrivers.awsLogs({
+        streamPrefix: "spgtest",
+        logRetention: logs.RetentionDays.ONE_WEEK
+      })
     });
     container.addPortMappings({
       containerPort: 3000
@@ -61,7 +85,7 @@ export class MyStack extends cdk.Stack {
       {
         cluster,
         taskDefinition,
-        healthCheckGracePeriod: cdk.Duration.seconds(600)
+        healthCheckGracePeriod: cdk.Duration.minutes(7)
       }
     );
 
