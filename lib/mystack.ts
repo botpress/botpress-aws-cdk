@@ -16,6 +16,11 @@ export class MyStack extends cdk.Stack {
       throw "DOMAIN_NAME must be defined";
     }
 
+    const licenseKey = process.env.BP_LICENSE_KEY;
+    if (!licenseKey) {
+      throw "BP_LICENSE_KEY must be defined";
+    }
+
     const vpc = new ec2.Vpc(this, "VPC");
 
     const dbSecret = new secretsmanager.Secret(this, "DbSecret", {
@@ -100,6 +105,7 @@ export class MyStack extends cdk.Stack {
         BPFS_STORAGE: "database",
         REDIS_URL: `redis://${cacheCluster.attrRedisEndpointAddress}:${cacheCluster.attrRedisEndpointPort}`,
         PRO_ENABLED: "true",
+        BP_LICENSE_KEY: licenseKey,
         CLUSTER_ENABLED: "true",
         AUTO_MIGRATE: "true",
         BP_MODULE_NLU_LANGUAGESOURCES: '[{"endpoint":"http://localhost:3100"}]',
@@ -116,7 +122,7 @@ export class MyStack extends cdk.Stack {
       containerPort: 3000
     });
 
-    const loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(
+    const ecsPattern = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
       "Service",
       {
@@ -127,23 +133,17 @@ export class MyStack extends cdk.Stack {
       }
     );
 
-    dbCluster.connections.allowFrom(
-      loadBalancedFargateService.service,
-      ec2.Port.allTraffic()
-    );
+    dbCluster.connections.allowFrom(ecsPattern.service, ec2.Port.allTraffic());
 
     redisSecurityGroup.connections.allowFrom(
-      loadBalancedFargateService.service,
+      ecsPattern.service,
       ec2.Port.allTraffic()
     );
 
-    loadBalancedFargateService.targetGroup.configureHealthCheck({
+    ecsPattern.targetGroup.configureHealthCheck({
       path: "/admin/"
     });
 
-    loadBalancedFargateService.targetGroup.setAttribute(
-      "stickiness.enabled",
-      "true"
-    );
+    ecsPattern.targetGroup.setAttribute("stickiness.enabled", "true");
   }
 }
