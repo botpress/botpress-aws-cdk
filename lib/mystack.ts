@@ -140,5 +140,10 @@ export class MyStack extends cdk.Stack {
     loadBalancedFargateService.targetGroup.configureHealthCheck({
       path: "/admin/"
     });
+
+    loadBalancedFargateService.targetGroup.setAttribute(
+      "stickiness.enabled",
+      "true"
+    );
   }
 }
