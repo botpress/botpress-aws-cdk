@@ -7,7 +7,7 @@ import secretsmanager = require("@aws-cdk/aws-secretsmanager");
 import logs = require("@aws-cdk/aws-logs");
 import elasticache = require("@aws-cdk/aws-elasticache");
 
-export class MyStack extends cdk.Stack {
+export class BotpressStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -69,7 +69,7 @@ export class MyStack extends cdk.Stack {
     );
     const cacheSubnetGroup = new elasticache.CfnSubnetGroup(
       this,
-      "CacheSubnetGroup",
+      "RedisSubnetGroup",
       {
         description: "",
         subnetIds: vpc.privateSubnets.map(subnet => subnet.subnetId)
@@ -83,15 +83,19 @@ export class MyStack extends cdk.Stack {
       cacheSubnetGroupName: cacheSubnetGroup.ref
     });
 
-    const cluster = new ecs.Cluster(this, "Cluster", {
+    const cluster = new ecs.Cluster(this, "EcsCluster", {
       vpc
     });
 
-    const taskDefinition = new ecs.FargateTaskDefinition(this, "TaskDef", {
-      memoryLimitMiB: 3072,
-      cpu: 512
-    });
-    const container = taskDefinition.addContainer("MyContainer", {
+    const taskDefinition = new ecs.FargateTaskDefinition(
+      this,
+      "TaskDefinition",
+      {
+        memoryLimitMiB: 3072,
+        cpu: 512
+      }
+    );
+    const container = taskDefinition.addContainer("Botpress", {
       image: ecs.ContainerImage.fromRegistry("botpress/server:v12_2_3"),
       command: [
         "/bin/bash",
@@ -114,7 +118,7 @@ export class MyStack extends cdk.Stack {
         BP_PRODUCTION: "true"
       },
       logging: ecs.LogDrivers.awsLogs({
-        streamPrefix: "spgtest",
+        streamPrefix: "botpress",
         logRetention: logs.RetentionDays.ONE_WEEK
       })
     });
@@ -124,7 +128,7 @@ export class MyStack extends cdk.Stack {
 
     const ecsPattern = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
-      "Service",
+      "EcsPattern",
       {
         cluster,
         taskDefinition,
