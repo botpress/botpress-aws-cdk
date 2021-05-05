@@ -17,14 +17,14 @@ This Botpress has the following characteristics:
 ### Prerequisites:
 
 - Make sure [`npx`](https://www.npmjs.com/package/npx) is on your `PATH`
-- Make sure [`yarn`](https://yarnpkg.com/lang/en/) is on your `PATH`
+- Make sure [`npm`](https://www.npmjs.com/get-npm) is on your `PATH`
 
 ### Installing node dependencies
 
 From the project's root, simply run:
 
 ```
-yarn
+npm i
 ```
 
 Now that dependencies are installed, you're ready to deploy to AWS.
