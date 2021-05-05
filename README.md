@@ -50,3 +50,8 @@ More information about AWS profiles can be found [here](https://docs.aws.amazon.
 ## Considerations
 
 - Since Fargate does not support Docker Volumes at this time, [disk space limits](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) the quantity of languages that can be installed in a single container. A more scalable approach would be to host the language server on an EC2 instance.
+
+## Connecting to the database
+
+1. In a terminal, from the `scripts/` directory: `AWS_PROFILE={your AWS profile} AWS_DEFAULT_REGION={your AWS region, e.g. us-east-1} ./connect.sh -o 3000 {the DNS name for your RDS instance, see RDS console to get it} 3306`
+2. In another terminal, `psql -h localhost -p 3306 -U master postgres`. The password can be found in AWS Secrets Manager

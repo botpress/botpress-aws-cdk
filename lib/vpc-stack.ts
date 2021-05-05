@@ -6,7 +6,7 @@ export class VpcStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = new ec2.Vpc(this, "Vpc", { maxAzs: 2 });
+    const vpc = new ec2.Vpc(this, "Vpc", { maxAzs: 2, natGateways: 1 }); // Cost-saving measures, increase those numbers for better redundancy
     this.vpc = vpc;
   }
 }
