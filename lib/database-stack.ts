@@ -76,16 +76,7 @@ export class DatabaseStack extends cdk.Stack {
     );
 
     const userData = ec2.UserData.forLinux();
-    userData.addCommands(
-      "yum -y install ec2-instance-connect unzip",
-      'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"',
-      "unzip -q awscliv2.zip",
-      "./aws/install",
-      "rm -dr aws awscliv2.zip",
-      "yum remove -y postgresql postgresql-server",
-      "yum install -y https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-6-x86_64/postgresql11-libs-11.4-1PGDG.rhel6.x86_64.rpm",
-      "yum install -y https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-6-x86_64/postgresql11-11.4-1PGDG.rhel6.x86_64.rpm"
-    );
+    userData.addCommands("yum -y install ec2-instance-connect");
 
     const bastionInstance = new ec2.Instance(this, "BastionInstance", {
       vpc,
