@@ -45,7 +45,8 @@ From the project's root:
 7. Create the database: `create database {db name} with owner {role name}`
 8. `npx cdk deploy -e Botpress-Domains --profile {your AWS profile} --parameters DomainName={your top level domain name, e.g. mycompany.com}`. While this stack is being created, you need to update the Name Servers in your domain registrar. First, find the newly created Hosted Zone in Route53. Copy the NS record values, and paste them in your registrar's DNS console. This step is necessary to validate the ACM Certificate.
 9. `npx cdk deploy -e Botpress-Services --profile {your AWS profile} --parameters License="your botpress license key" --parameters DatabaseURL="postgres://{role name}:{role password}@{the DNS name for your RDS instance, see RDS console to get it}:3306/{db name}"`
-10. Your Botpress instance will be available at `https://botpress.{your top level domain}`
+10. `npx cdk deploy -e Botpress-WAF --profile {your AWS profile}`
+11. Your Botpress instance will be available at `https://botpress.{your top level domain}`
 
 ## Connecting to the database
 
